@@ -1,0 +1,115 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}VC Lobby{% endblock %}
+
+{% block content %}
+
+<!-- <link rel='stylesheet' type='text/css' media='screen' href="{% static 'blog/vc.css' %}"> -->
+
+<style>
+    .media {
+        align-items: center;
+    }
+</style>
+{% if not friends %}
+    <span class="container">You need to be friends wih someone to call</span>
+{% endif %}
+
+<div class="col-md-8 m-auto">
+  
+    <!-- ALL CALLROOMS-->
+    <div class="px-0">
+        <div class="bg-white">
+
+        <div class="">
+            <div class="list-group rounded-0">
+
+            {% for friend in friends %}
+              
+                <div class="list-group-item list-group-item-action list-group-item-light rounded-0">
+                    <div class="media">
+                        <div class="img-cont2">
+                            <img src="{{friend.profile.image.url}}" alt="room" width="50" height="50" class="rounded-circle">
+                            {% if friend.profile.is_online %}
+                                <span class="online-circle2"></span>  
+                            {% else %}
+                                <span class="offline-circle2"></span>
+                            {% endif %}
+                        </div>
+                        <div class="media-body ml-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="mb-1">
+                                    {{friend.username}}
+                                </h6>
+                                <div>
+                                    <a class="p-2 h5" href="{% url 'room-choice' friend.pk %}"><i class="fas fa-comment-alt"></i></a>
+                                    
+                                    <a style="cursor:pointer;" class="p-2 h4" onclick="handleVCRedirect('{{friend.pk}}','{{request.user.username}}')"><i class="fas fa-video"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+            </div>
+        </div>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    async function handleVCRedirect(id1,name) {
+        // let room = (parseInt(id1) > parseInt(id2)) ? "vcroom_" + id1 + "_" + {{request.user.id}} : "vcroom_" + {{request.user.id}} + "_" + id1;
+        // room = room.toUpperCase()
+        room = id1
+
+        let response = await fetch(`get_token/?channel=${room}`)
+        
+        if(response.status == 200) {
+            let data = await response.json()
+            console.log(response);
+
+            let UID = data.uid
+            let token = data.token
+            let room_name = data.room_name
+
+            sessionStorage.setItem('UID', UID)
+            sessionStorage.setItem('token', token)
+            sessionStorage.setItem('room', room_name)
+            sessionStorage.setItem('name', name)
+
+            window.open('/vc/room/', '_blank')
+        }
+    }
+    
+</script>
+{% endblock script %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="col-md-8">
+
+    
+<br>
+</div>
+
+

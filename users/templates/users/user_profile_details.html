@@ -1,0 +1,350 @@
+{% extends "blog/base.html" %}
+
+{% block title %}User profile{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8">
+
+<div class="content-section" style="width: 100%">
+    <div class="account-img-container">
+        <div class="img-cont">
+            <img class="rounded-circle account-img" src="{{object.user.profile.image.url}}" alt="image">
+            {% if object.user.profile.is_online %}
+                <div class="online-circle"></div>
+            {% else %}
+                <div class="offline-circle"></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <hr>
+        <h4 class="card-title text-center">{{object.user.first_name}} {{object.user.last_name}} [{{object.user.username}}]</h4>
+        <p class="card-text text-center text-muted">{{object.user.email}}</p>
+        <p class="card-text text-center text-muted">{{object.user.profile.bio}}</p>
+
+		<ul class="social-links list-inline text-center m-4">
+			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-primary" href="" data-original-title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-info" href="" data-original-title="Twitter"><i class="fab fa-twitter"></i></a></li>
+			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-danger" href="" data-original-title="Skype"><i class="fab fa-instagram"></i></a></li>
+			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-primary" href="" data-original-title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
+		</ul>
+
+        <div class="text-center">
+            {% if object.user != user %}
+                {% if follow %}
+                    <form action="{% url 'follow-unfollow-view' %}" method='POST'>
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="btn btn-danger mb-2 w-50">Unfollow</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'follow-unfollow-view' %}" method='POST'>
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="btn btn-primary mb-2 w-50">Follow</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+			<!-- THEM to YOU -->
+			{% if request_sent == 0 %}
+				<div class="card m-2 p-4">
+					<div class="flex text-center align-items-center">
+						<p class="align-items-center mr-2 h5 text-muted">Accept Friend Request</p>
+						<span id="id_cancel_{{object.user.id}}" class="decline-friend-request material-icons p-1 m-1" onclick='triggerDeclineFriendRequest("{{pending_friend_request_id}}")'><i class="fas fa-times-circle"></i></span>
+						<span id="id_confirm_{{object.user.id}}" class="confirm-friend-request material-icons p-1 m-1" onclick='triggerAcceptFriendRequest("{{pending_friend_request_id}}")'><i class="fas fa-check-circle"></i></span>
+					</div>
+				</div>
+			{% endif %}
+			
+			<!-- Cancel Friend Request / Send Friend Request / Remove Friend -->
+			{% if is_friend == False and is_self == False %}
+				<!-- You sent them a request -->
+				{% if request_sent == 1 %}
+					<div class="d-flex flex-column align-items-center pt-4">
+						<button class="btn btn-danger w-50" id="id_cancel_friend_request_btn">
+							Cancel Friend Request
+						</button>
+					</div>
+				{% endif %}
+				<!-- No requests have been sent -->
+				{% if request_sent == -1 %}
+					<div class="d-flex flex-column align-items-center pt-4">
+						<button class="btn btn-primary w-50" id="id_send_friend_request_btn">
+							Send Friend Request
+						</button>
+					</div>
+				{% endif %}
+			{% endif %}
+				
+			{% if is_friend %}
+				<div class="dropdown pt-4 m-auto">
+					<button class="btn btn-success dropdown-toggle friends-btn w-50" type="button" id="id_friends_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Friends
+					</button>
+					<div class="dropdown-menu" aria-labelledby="id_friends_toggle">
+						<a class="dropdown-item" href="#" onclick="removeFriend('{{object.user.id}}', onFriendRemoved)">Unfriend</a>
+					</div>
+				</div>
+			{% endif %}
+
+			{% if friend_requests %}
+				<div class="card m-2 px-4 pb-4">
+					<!-- Friend requests -->
+					<div class="d-flex flex-column pt-4">
+						<a href="{% url 'friend:friend-requests' user_id=object.user.id %}">
+							<div class="d-flex flex-row align-items-center justify-content-center icon-container">
+								<span class="friend-text">Friend Requests ({{friend_requests|length}})</span>
+							</div>
+						</a>
+					</div>
+				</div>
+			{% endif %}
+
+        </div>
+        <hr>
+
+
+        <div class="m-t-10 p-15 text-center">
+            <div class="row">
+                <div class="col">
+                    <span class="h6">Posts</span>
+                    <p><a class="mr-2" href="{% url 'user-posts' object.user %}">{{object.profile_posts.count}}</a></p>
+                </div>
+                <div class="col">
+                    <span class="h6">Friends</span>
+                    <p title="Friends">
+                        <a href="{% url 'friend:list' object.user.id %}">{{friends|length}}</a>
+                    </p>
+                </div>
+                <div class="col">
+                    <span class="h6">Followers</span>
+                    <p style="cursor:pointer; color: blue;" data-toggle="modal" data-target="#exampleModal" data-contents="{{object.user.following.all}}" data-title="Followers" title="Followers">{{object.user.following.count}}</p>
+                </div>
+                <div class="col">
+                    <span class="h6">Following</span>
+					<p style="cursor:pointer; color: blue;" data-toggle="modal" data-target="#exampleModal" data-contents="{{object.user.profile.following.all}}" data-title="Following" title="Following">{{object.user.profile.following.count}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+
+
+
+<style type="text/css">
+
+.social-links li a {
+    border-radius: 50%;
+    color: rgba(255, 255, 255);
+    display: inline-block;
+    height: 40px;
+    line-height: 35px;
+    border: 2px solid transparent;
+    text-align: center;
+    width: 40px;
+	font-size: 14px;
+}
+
+
+
+	.profile-image{
+		max-height: 100px;
+		max-width: 100px;
+	}
+	.profile-image{
+		border-radius: 12px;
+	}
+	.card{
+		border-radius: 12px;
+	}
+	
+	.profile-link{
+		color: #000;
+	}
+	.material-icons{
+		font-size: 30px;
+	}
+	.material-icons:hover{
+		cursor: pointer;
+	}
+	.confirm-friend-request{
+		color: green;
+	}
+	.confirm-friend-request:hover {
+		opacity: 0.3;
+	}
+	.decline-friend-request:hover {
+		opacity: 0.3;
+	}
+	.decline-friend-request{
+		color: red;
+	}
+</style>
+
+<div>
+
+	{% if is_friend %}
+		<a class="align-items-center btn btn-primary d-flex flex-column" href="{% url 'room-choice' object.user.id %}">
+			<i class="fas fa-comments"></i>&nbsp;&nbsp;Message
+		</a>
+	{% endif %}
+
+</div>
+
+<br>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body">
+		  ...
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+</div>
+
+
+<!-- SIDEBAR -->
+<div class="col-md-4">
+    <div class="content-section">
+		<h4>Posts by {{object.user}} ({{object.profile_posts.count}}) : </h4>
+
+		{% if object.profile_posts.count == 0 %}
+			<br>
+			<span class="text-muted">{{object.user.username}} has not posted anything yet</span>
+			<br>
+		{% endif %}
+
+		{% for post in object.profile_posts %}
+			<hr>
+			<div>
+				<a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a>
+			</div>
+		{% endfor %}
+		<br>
+	</div>
+</div>  
+
+
+<script type="text/javascript">
+
+	function onFriendRequestSent(){
+		location.reload();
+	}
+
+	function onFriendRequestCancelled(){
+		location.reload();
+	}
+
+	function onFriendRemoved(){
+		location.reload();
+	}
+
+	function onFriendRequestAccepted(){
+		location.reload();
+	}
+
+	function onFriendRequestDeclined(){
+		location.reload();
+	}
+
+
+	var sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn")
+	if (sendFriendRequestBtn != null){
+		sendFriendRequestBtn.addEventListener("click", function(){
+			sendFriendRequest("{{object.user.id}}", onFriendRequestSent)
+		})
+	}
+
+	var cancelFriendRequestBtn = document.getElementById("id_cancel_friend_request_btn")
+	if(cancelFriendRequestBtn != null){
+		cancelFriendRequestBtn.addEventListener("click", function(){
+			cancelFriendRequest("{{object.user.id}}", onFriendRequestCancelled)
+		})
+	}
+
+	var removeFriendBtn = document.getElementById("id_unfriend_btn")
+	if (removeFriendBtn != null){
+		removeFriendBtn.addEventListener("click", function(){
+			removeFriend("{{object.user.id}}", onFriendRemoved)
+		})
+	}
+
+	function triggerAcceptFriendRequest(friend_request_id){
+		acceptFriendRequest(friend_request_id, onFriendRequestAccepted)
+	}
+
+	function triggerDeclineFriendRequest(friend_request_id){
+		declineFriendRequest(friend_request_id, onFriendRequestDeclined)
+	}
+	
+</script>
+
+{% include 'friend/snippets/send_friend_request.html' %}
+{% include 'friend/snippets/accept_friend_request.html' %}
+{% include 'friend/snippets/decline_friend_request.html' %}
+{% include 'friend/snippets/cancel_friend_request.html' %}
+{% include 'friend/snippets/remove_friend.html' %}
+
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+	$('#exampleModal').on('show.bs.modal', function (event) {
+		var button = $(event.relatedTarget) 
+		var mcontents = button.data('contents') 
+		var mtitle = button.data('title') 
+		
+		var modal = $(this)
+		var mlist = ""
+		var mbody = ""
+
+		if (mtitle === "Followers") {
+			mtitle = mtitle + ' ({{object.user.following.count}})'
+			{% for fs in object.user.following.all %}
+				mlist += `<li class="m-1">
+							<a href="{% url 'profile-detail-view' pk=fs.pk %}">
+								{{fs.user}}
+							</a>
+						</li>`
+			{% endfor %}
+			mbody = `<ul>${mlist}</ul>`
+		}
+		if (mtitle === "Following") {
+			mtitle = mtitle + ' ({{object.user.profile.following.count}})'
+			{% for fs in object.user.profile.following.all %}
+				mlist += `<li class="m-1">
+							<a href="{% url 'profile-detail-view' pk=fs.pk %}">
+								{{fs.user}}
+							</a>
+						</li>`
+			{% endfor %}
+			mbody = `<ul>${mlist}</ul>`
+		}
+		modal.find('.modal-title').text(mtitle)
+		modal.find('.modal-body').html(mbody)
+	});
+</script>
+
+	
+{% endblock %}

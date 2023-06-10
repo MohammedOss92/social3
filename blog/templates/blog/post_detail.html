@@ -1,0 +1,52 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Post{% endblock %}
+
+{% block content %}
+
+<div class="col-md-10 m-auto">
+    
+<article class="content-section" style="overflow: auto;">
+
+    <div class="media">
+        <img class="rounded-circle article-img" src="{{post.author.profile.image.url}}" alt="image">
+        <div class="media-body">
+            <h4 class="d-inline"><a class="mr-2" href="{% url 'profile-detail-view' post.author.pk %}">{{ post.author }}</a></h4>
+            <div id="save-section">
+                {% include 'blog/save_section.html' %}
+            </div>
+            <p><small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small></p>
+        </div>
+    </div>
+    <hr>
+    <h3 class="d-inline"><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h3>
+    {% if post.author == user %}
+        <div class="d-inline float-right">
+            &nbsp;&nbsp;&nbsp;<a class="btn btnedit" href="{% url 'post-update' post.id %}"><i class="far fa-edit"></i></a>
+            &nbsp;&nbsp;&nbsp;<a class="btn btndel" href="{% url 'post-delete' post.id %}"><i class="far fa-trash-alt"></i></a>
+        </div>
+    {% endif %} 
+    
+
+    <hr>
+    <p class="article-content">{{ post.content|safe }}</p>
+</article>
+
+<div id="like-section">
+    {% include 'blog/like_section.html' %}
+</div>
+
+
+<hr>
+
+<div class="main-comment-section">
+    {% include 'blog/comments.html' %}
+</div>
+
+
+<br><br>
+
+</div>
+
+
+{% endblock %}

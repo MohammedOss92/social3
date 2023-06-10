@@ -1,0 +1,114 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Feed{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8">
+    
+    {% if posts|length == 0 %}
+      <span class="text-muted">You must follow someone to view posts on your feeds</span>
+      <br><br>
+    {% endif %}
+
+    {% for post in posts %}
+
+    <article class="content-section" style="overflow: auto;">
+      <div class="media">
+        <div class="img-cont3">
+          <img class="rounded-circle article-img" src="{{post.author.profile.image.url}}" alt="image">
+          {% if post.author.profile.is_online %}
+              <span class="online-circle4"></span>
+          {% else %}
+              <span class="offline-circle4"></span>
+          {% endif %}
+        </div>
+        <div class="media-body">
+          <p>
+            <a class="mr-2 h4" href="{% url 'profile-detail-view' post.author.pk %}">{{ post.author }}</a>
+          </p>
+          <small class="text-muted">{{ post.date_posted|date:"F d, Y-h:i A" }}</small>        
+        </div>
+    </div>
+    <hr>
+    <h3><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h3>
+    <hr>
+      <p class="article-content">{{ post.content|safe|linebreaks|truncatewords_html:"20" }}<a href="{% url 'post-detail' post.id %}">[Read full post]</a></p>
+    </article>
+    {% endfor %}
+
+
+    
+
+    {% if posts.has_other_pages %}
+
+      {% if posts.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{posts.previous_page_number}}">Previous</a>
+      {% endif %}
+
+      {% for num in posts.paginator.page_range %}
+        {% if posts.number == num %}
+          <a class="btn btn-info mb-4" href="?page={{num}}">{{num}}</a>
+        {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{num}}">{{num}}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if posts.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{posts.next_page_number}}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{posts.paginator.num_pages}}">Last</a>
+      {% endif %}
+
+    {% endif %}
+</div>
+
+
+<!-- SIDEBAR -->
+<div class="col-md-4">
+  <div class="content-section" style="border-top: 4px solid red;">
+    
+    <h4>Recent Posts</h4>
+    <br>
+      <ul class="list-group">
+          {% if posts.0 %}
+            <a href="{% url 'post-detail' posts.0.pk %}"><li class="list-group-item list-group-item-light">{{ posts.0.title }}</li></a>
+          {% else %}
+            <span class="text-muted">Your Feed is empty</span>
+          {% endif %}
+          {% if posts.1 %}
+            <a href="{% url 'post-detail' posts.1.pk %}"><li class="list-group-item list-group-item-light">{{ posts.1.title }}</li></a>
+          {% endif %}
+          {% if posts.2 %}
+            <a href="{% url 'post-detail' posts.2.pk %}"><li class="list-group-item list-group-item-light">{{ posts.2.title }}</li></a>
+          {% endif %}
+          {% if posts.3 %}
+            <a href="{% url 'post-detail' posts.3.pk %}"><li class="list-group-item list-group-item-light">{{ posts.3.title }}</li></a>
+          {% endif %}
+          {% if posts.4 %}
+            <a href="{% url 'post-detail' posts.4.pk %}"><li class="list-group-item list-group-item-light">{{ posts.4.title }}</li></a>
+          {% endif %}
+      </ul>
+      
+      <br>
+        <div>
+          <a class="btn btn-info" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Following &nbsp;<i class="fas fa-angle-down"></i></a>
+          <a class="btn btn-warning float-right" href="{% url 'profile-list-view' %}">All users</a>
+          <br>
+          <div class="collapse" id="collapseExample">
+              {% if profile.following.all %}
+                  {% for p in profile.following.all %}
+                      <hr>
+                      <a class="mr-2" href="{% url 'profile-detail-view' p.pk %}">{{ p }}</a>
+                  {% endfor %}
+              {% else %}
+                  <hr>
+                  <span class="text-muted">You don't follow anyone...</span>&nbsp;&nbsp;<a href="{% url 'profile-list-view' %}">Find someone</a>
+              {% endif %}
+        </div>
+      </div>
+      </p>
+  </div>
+</div>  
+
+{% endblock %}

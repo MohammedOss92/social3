@@ -1,0 +1,71 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="col-md-8 m-auto">
+
+{% if friends %}
+	<div class="content-section">
+		{% for friend in friends %}
+			<div class="media mb-3">
+				<img class="rounded-circle article-img" src="{{friend.0.profile.image.url}}" alt="image">
+				<div class="media-body">
+					<div class="inline float-left">
+						<p>
+							<a class="mr-2 h4" href="{% url 'profile-detail-view' pk=friend.0.pk %}">{{friend.0.username|truncatechars:50}}</a>
+						</p>
+						{% if friend.1 %}
+							<a href="{% url 'room-choice' friend.0.id %}">Send a Message</a>
+						{% endif %}
+					</div>
+
+					{% if friend.1 %}
+						<span class="inline float-right" style="color: rgb(0, 196, 0);">
+							<i class="fas fa-check-circle"></i>&nbsp;&nbsp;Friends
+						</span>
+					{% else %}
+						{% if friend.0 !=  request.user %}
+							<span class="inline float-right" style="color: rgb(216, 0, 0);">
+								<i class="fas fa-times-circle"></i>&nbsp;&nbsp;Not Friends
+							</span>
+						{% endif %}
+					{% endif %}
+					{% if friend.0 == request.user %}
+						<span class="inline float-right" style="color: rgb(0, 65, 245);">
+							<i class="fas fa-user-circle"></i>&nbsp;&nbsp;This is you
+						</span>
+					{% endif %}
+				
+				</div>
+			</div>
+			<hr>
+		{% endfor %}
+	</div>
+{% else %} <!-- If no friends -->
+	<div class="d-flex flex-row flex-grow-1 justify-content-center align-items-center p-4">
+		<p>You are not friends with anyone.</p>
+	</div>
+{% endif %}
+
+
+
+
+</div>
+
+<!-- SIDEBAR -->
+<!-- <div class="col-md-4">
+    <div class="content-section">
+        <h3>Our Sidebar</h3>
+        <p class="text-muted">You can put any information here you'd like.
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+            </ul>
+        </p>
+    </div>
+</div>   -->
+
+{% endblock content %}

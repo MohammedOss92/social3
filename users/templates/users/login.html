@@ -1,0 +1,68 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<style>
+.btn-google {
+    color: #545454;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 1px #ddd
+}
+
+.or-container {
+    align-items: center;
+    color: #ccc;
+    display: flex;
+    margin: 25px 0
+}
+
+.line-separator {
+    background-color: #ccc;
+    flex-grow: 5;
+    height: 1px
+}
+
+.or-label {
+    flex-grow: 1;
+    margin: 0 15px;
+    text-align: center
+}
+</style>
+
+<div class="m-auto col-md-8">
+<div class="content-section">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Login</legend>
+            {{form|crispy}}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Login</button>
+            <small class="text-muted ml-2">
+                <a href="{% url 'password_reset' %}">Forgot Password?</a>
+            </small>
+        </div>
+    </form>
+    <div class="or-container">
+        <div class="line-separator"></div>
+        <div class="or-label">or</div>
+        <div class="line-separator"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12"> <a class="btn btn-lg btn-google btn-block btn-outline" href="#"><img src="https://img.icons8.com/color/18/000000/google-logo.png"> Sign In with <b>Google</b></a> </div>
+    </div> <br>
+    <div class="row">
+        <div class="col-md-12"> <a class="btn btn-lg btn-google btn-block btn-outline" href="#"><img src="https://img.icons8.com/material-sharp/18/000000/github.png"/> Sign In with <b>Github</b></a> </div>
+    </div> <br>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Need an Account? <a class="ml-2" href="{% url 'register' %}">Sign Up Now</a>
+        </small>
+    </div>
+</div>
+</div>
+{% endblock %}
