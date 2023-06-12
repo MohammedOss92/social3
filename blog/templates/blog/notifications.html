@@ -5,6 +5,11 @@
 
 {% block content %}
 
+<link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}" />
+
 {% if notifications|length == 0 %}
     <span class="content-section container">No Notifications</span>
 {% endif %}

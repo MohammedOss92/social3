@@ -1,9 +1,13 @@
 {% extends "blog/base.html" %}
 
 {% block title %}Liked Posts{% endblock %}
+{% load static %}
 
 {% block content %}
-
+<link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}" />
 <div class="col-md-8 m-auto">
 
 <div class="content-section">

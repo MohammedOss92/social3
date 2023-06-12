@@ -1,8 +1,15 @@
 {% extends "blog/base.html" %}
 
 {% block title %}Delete Post{% endblock %}
+{% load static %}
 
 {% block content %}
+
+<link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}" />
+
 <div class="content-section">
     <form action="" method="POST">
         {% csrf_token %}

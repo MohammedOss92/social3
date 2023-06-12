@@ -1,3 +1,9 @@
+{% load static %}
+
+<link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}" />
 <form action="{% url 'post-like' %}" method="POST">
     {% csrf_token %}
 

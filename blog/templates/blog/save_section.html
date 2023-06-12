@@ -1,3 +1,11 @@
+{% load static %}
+
+
+<link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}" />
+
 <form class="d-inline float-right" action="{% url 'post-save' %}" method="POST">
     {% csrf_token %}
 
