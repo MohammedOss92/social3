@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+{% load static %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
@@ -36,7 +36,7 @@
                         <a class="btn btn-lg btn-primary-soft text-primary font-weight-bold" href="{% url 'account_login' %}">LOGIN</a>
                       {% endif %}
                   </div>
-                  <div class="col-lg-6 d-none d-lg-block" data-aos="fade-up" data-aos-delay="100"><img class="img-fluid" src="static/blog/a.png" alt="Social Interaction" /></div>
+                  <div class="col-lg-6 d-none d-lg-block" ><img class="img-fluid" src="blog/static/blog/Capture.png" alt="Social Interaction" /></div>
               </div>
           </div>
       </div>
