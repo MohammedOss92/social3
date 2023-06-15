@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'crispy_bootstrap4' ,
     'ckeditor',
+    'ckeditor_uploader',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -65,6 +66,8 @@ INSTALLED_APPS = [
     'friend',
     'videocall',
 ]
+CKEDITOR_UPLOAD_PATH = 'content/ckeditor/'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
